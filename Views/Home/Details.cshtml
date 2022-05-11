@@ -1,0 +1,99 @@
+﻿@model BookStore.Models.Product
+
+@{
+    ViewBag.Title = "網路書城";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="details__body">
+    <section class="details__product">
+        <div class="content">
+
+            <!-- 圖片 -->
+            <div class="details__photo">
+                <div class="photo-container">
+                    <div class="photo-main">
+                        @if (Model.PrdImage != null && Model.PrdImageEXT != null)
+                        {
+                            <img src="data:image/@Model.PrdImageEXT;base64,@Convert.ToBase64String(@Model.PrdImage)" alt="" />
+                        }
+                        else
+                        { <img src="" />}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 名稱 -->
+            <div class="title">
+                <h1 style="color:black">@Model.PrdName</h1>
+            </div>
+
+            <!-- 價格 -->
+            <div class="details__price">
+                <b>售價:</b> $<span>@Model.PrdPrice</span>
+            </div>
+
+            <!-- 商品介紹 -->
+            <div class="description">
+                <b style="color:black">商品狀態:</b> @Model.PrdStatus </br>
+                <b style="color:black">商品庫存量:</b> @Model.PrdQuantity </br>
+                <b style="color:black">商品介紹:</b> @Model.PrdContent
+            </div>
+
+            <form id="CartForm">
+
+                @Html.AntiForgeryToken()
+
+                <!--HiddenFor傳 _PrdID 到Controller-->
+                @Html.HiddenFor(x => x.PrdID)
+
+                <!-- 購買數量 -->
+                <div class="product-quantity">
+                    <b for="product-quantity-input" class="product-quantity-label">購買數量</b>
+
+                    <div class="product-quantity-subtract">
+                        <i class="fa fa-chevron-left"></i>
+                    </div>
+
+                    <div>
+                        @Html.TextBox("Quantity", "1", new { id = "product-quantity-input", placeholder = "0" })
+                        @*<input type="text" id="product-quantity-input" placeholder="0" value="1" />*@
+                    </div>
+
+                    <div class="product-quantity-add">
+                        <i class="fa fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <!-- 加入購物車 -->
+                <input type="button" class="buy--btn" onclick="AddToCartForm()" value="加入購物車">
+            </form>
+
+        </div>
+    </section>
+</div>
+
+@section Quantity{
+    <script type="text/javascript">
+
+        //Reduce quantity by 1 if clicked
+        $(document).on("click", ".product-quantity-subtract", function (e) {
+            var value = $("#product-quantity-input").val();
+            //console.log(value);
+            var newValue = parseInt(value) - 1;
+            if (newValue < 0) newValue = 0;
+            $("#product-quantity-input").val(newValue);
+            CalcPrice(newValue);
+        });
+
+        //Increase quantity by 1 if clicked
+        $(document).on("click", ".product-quantity-add", function (e) {
+            var value = $("#product-quantity-input").val();
+            //console.log(value);
+            var newValue = parseInt(value) + 1;
+            $("#product-quantity-input").val(newValue);
+            CalcPrice(newValue);
+        });
+
+    </script>
+}

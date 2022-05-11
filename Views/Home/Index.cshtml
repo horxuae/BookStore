@@ -1,0 +1,98 @@
+﻿@model IPagedList<BookStore.Models.Product>
+@using BookStore.Models;
+@using BookStore.Services
+@using PagedList;
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "網路書城";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content -->
+<!-- 主要內容 -->
+<div id="content">
+
+    @if (@ViewBag.Message != null)
+    {
+        <br />
+        @Html.Raw(ViewBag.Message)
+    }
+    else
+    {
+        <!-- Content Slider -->
+        <!-- 推薦活動 -->
+        <div id="slider" class="box">
+
+            @*Session活動圖檔*@
+            <ul class="slides">
+                @{
+                    List<Image> ActivityImage = (List<Image>)Session["ActivityImage"];
+
+                    foreach (Image m in ActivityImage)
+                    {
+                        <input type="radio" id=@m.ImageID name="control">
+                    }
+                    foreach (Image m in ActivityImage)
+                    {
+                        <li class="slide">
+                            <a href="">
+                                @*<img src="~/images/slide1.png" alt="" style="width:710px; height:285px;" />*@
+                                <img src="data:image/@m.ImageEXT;base64,@Convert.ToBase64String(@m.ImageContent)" style="width:710px; height:285px;" />
+                            </a>
+                        </li>
+                    }
+                    <div class="controls-visible">
+                        @foreach (Image m in ActivityImage)
+                        {
+                            <label for=@m.ImageID></label>
+                        }
+                    </div>
+                }
+            </ul>
+        </div>
+        <!-- End Content Slider -->
+
+        <!-- Products -->
+        <!-- 商品列表 -->
+        <div class="products">
+            <div class="cl">&nbsp;</div>
+            <ul>
+                @foreach (Product x in @Model)
+                {
+                    <li>
+                        <a href="@Url.Action("Details", "Home", new { _PrdID = @x.PrdID })">
+                            @if (x.PrdImage != null && x.PrdImageEXT != null)
+                            {
+                                <img src="data:image/x.PrdImageEXT;base64,@Convert.ToBase64String(x.PrdImage)" alt="" style="width: 220px; height: 220px;" />
+                            }
+                            else
+                            { <img src="" />}
+                        </a>
+
+                        <div class="product-info">
+                            <h3>@x.PrdName</h3>
+                            <div class="product-desc">
+                                <p>庫存數 : @x.PrdQuantity</p>
+                                <strong class="price">$@x.PrdPrice</strong>
+                                <br />
+
+                                <button onclick="location.href='@Url.Action("Details", "Home", new { _PrdID = @x.PrdID })'">詳細資料</button>
+                                @*<button> @Html.ActionLink("詳細資料", "Details", new { _PrdID = @x.PrdID }, new { style = "text-decoration:none; " }) </button>*@
+                                <button onclick="AddToCart('@x.PrdID', 1)">加入購物車</button>
+                                @*<button> @Ajax.ActionLink("加入購物車", "AddToCart", "Cart", new { _PrdID = @x.PrdID, _Quantity = 1 }, new AjaxOptions() { HttpMethod = "Post", OnSuccess = "Show()", OnFailure = "" }, new { style = "text-decoration:none; color:#fff; font-size: 0.8em;" }) </button>*@
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+            <div class="cl">&nbsp;</div>
+        </div>
+
+        <!-- 跳頁 -->
+        <div align="center"> @Html.PagedListPager(@Model, Page => Url.Action("Index", new { _Page = Page })) </div>
+        <!-- End Products -->
+    }
+
+</div>
+<!-- End Content -->

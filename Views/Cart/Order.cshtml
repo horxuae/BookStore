@@ -1,0 +1,72 @@
+﻿@model IPagedList<BookStore.Models.CartItem>
+@using BookStore.Models;
+@using BookStore.Services
+@using PagedList;
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "網路書城";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    //取得購物車Session
+    Cart currentCart = BookStore.Models.Operation.GetCurrentCart();
+}
+
+<h1>結帳</h1>
+
+<div class="content">
+
+    <table class="table">
+
+
+    </table>
+
+</div>
+
+<table class="table">
+    <tr>
+        @*<th>
+            @Html.DisplayNameFor(model => model.PrdID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PrdName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PrdPrice)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BuyQuantity)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BuyAmount)
+        </th>
+        <th></th>*@
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PrdID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PrdName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PrdPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BuyQuantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BuyAmount)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+    }
+
+</table>

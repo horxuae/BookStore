@@ -1,0 +1,71 @@
+﻿@model IPagedList<BookStore.Models.Product>
+@using BookStore.Models;
+@using BookStore.Services
+@using PagedList;
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "網路書城";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content">
+
+    <table class="table">
+
+        <!-- 標題 -->
+        <tr>
+            <th>@Html.Label("圖片")</th>
+            <th>@Html.Label("編號")</th>
+            <th>@Html.Label("狀態")</th>
+            <th>@Html.Label("名稱")</th>
+            <th>@Html.Label("售價")</th>
+            <th>@Html.Label("庫存量")</th>
+            <th></th>
+        </tr>
+
+        <!-- 資料 -->
+        @foreach (Product m in @Model)
+        {
+            <tr>
+                <td>
+                    @if (m.PrdImage != null && m.PrdImageEXT != null)
+                    {
+                        <img src="data:image/m.PrdImageEXT;base64,@Convert.ToBase64String(m.PrdImage)" alt="" style="width:65px; height:65px;" />
+                    }
+                    else
+                    { <img src="" style="width: 100%; height: 100%; ">}
+                </td>
+
+                <!-- model為保留字 -->
+                <td>@Html.DisplayFor(modelm => m.PrdID)</td>
+                <td>@Html.DisplayFor(modelm => m.PrdStatus)</td>
+                <td style="text-align: left;">@Html.DisplayFor(modelm => m.PrdName)</td>
+                <td>$@Html.DisplayFor(modelm => m.PrdPrice)</td>
+                <td>@Html.DisplayFor(modelm => m.PrdQuantity)</td>
+                <td>
+                    <button onclick="location.href='@Url.Action("Edit", "Home", new { _PrdID = m.PrdID })'">修改</button>
+                    @*<button style="border-radius: 7px; box-shadow: 2px 2px 25px -7px #4c4c4c;">*@
+                    @*@Html.ActionLink("修改", "Edit", new { _PrdID = m.PrdID }, new { style = "text-decoration:none; color:black; font-size: 0.8em;" })*@
+                    @*</button>*@
+                </td>
+            </tr>
+        }
+    </table>
+
+    <table>
+        <tr>
+            <td style="width: 5%;">
+                <div align="right">
+                    <button class="btn" onclick="location.href='@Url.Action("Create", "Home")'">新增商品</button>
+                </div>
+            </td>
+            <td align="center" style="width: 95%;">
+                <div align="center">
+                    <!-- 跳頁 -->
+                    @Html.PagedListPager(@Model, Page => Url.Action("List", new { _Page = Page }))
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>

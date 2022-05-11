@@ -1,0 +1,57 @@
+﻿@using BookStore.Models
+@using BookStore.Services
+
+<!--建立選單區塊-->
+@{
+    List<Option> MenuTypeList = null;
+    List<Option> PrdTypeList = null;
+
+    try
+    {
+        //取得Session
+        MenuTypeList = (List<Option>)Session["MenuTypeList"];
+        PrdTypeList = (List<Option>)Session["PrdTypeList"];
+    }
+    catch (Exception ex)
+    {
+        Response.Redirect("~/Test");//依據Route導向預設頁面
+        Response.End();
+    }
+}
+
+<div class="box categories">
+    <h2>商品種類 <span></span></h2>
+
+    <div class="box-content">
+        @foreach (Option m in MenuTypeList)
+        {
+            <ul>
+                <li class="dropdown">
+                    <!--DropDowm第一層(清單種類)-->
+                    <button class="dropbtn" href="@m.ListID" data-toggle="dropdown">@m.ListName</button>
+
+                    <ul class="dropdown-menu" id="@m.ListID">
+                        @foreach (Option sm in PrdTypeList.Where(x => x.ListID.Substring(0, 1) == m.ListID))
+                        {
+                            <!--DropDowm第二層(產品總類)-->
+                            <li class="dropdown-item"> @Html.ActionLink(@sm.ListName, "IndexConfirm", new { _PrdType = sm.ListID }) </li>
+
+                            <!-- #region (註解)使用DropDown -->
+                            @* <a href="#@sm.ListID" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">@sm.ListName</a>
+                                <ul id="@sm.ListID" class="collapse list-unstyled">
+                                  @foreach (SYS_FUNCTION f in sm.Functions)
+                                  {
+                                       <li>
+                                          <a href="~/@(f.Function_Url)">@f.Function_Name</a>
+                                       </li>
+                                   }
+                                </ul> *@
+                            <!-- #endregion -->
+                        }
+                    </ul>
+                </li>
+            </ul>
+        }
+        <p></p>
+    </div>
+</div>

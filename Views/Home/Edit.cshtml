@@ -1,0 +1,282 @@
+﻿@model BookStore.Models.Product
+@using BookStore.Models
+@using BookStore.Services
+@using System.Web.Optimization;
+
+@{
+    ViewBag.Title = "網路書城";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- 圖檔 -->
+
+<div style="width: 700px">
+    <fieldset style="border: 8px #fff8ad groove;">
+        <table style="width:100%;">
+            <tr>
+                <legend><h3 style="color:black">商品圖檔</h3></legend>
+
+                <td>
+                    @if (Model.PrdImage != null && Model.PrdImageEXT != null)
+                    {
+                        <img id="img1" src="data:image/@Model.PrdImageEXT;base64,@Convert.ToBase64String(@Model.PrdImage)" alt="" style="width: 200px; height: 200px;" />
+                    }
+                    else
+                    { <img id="img1" src="" style="width:300px; height:260px;">}
+                </td>
+                <td valign="middle">
+                    @using (@Html.BeginForm("EditUploadFile", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(x => x.PrdID)
+
+                        <input type="file" name="_FileName" id="file1" />
+                        <br /><br />
+                        <input type="submit" value="上傳" class="btn" />
+                    }
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+</div>
+<br />
+
+<!-- 圖檔 -->
+@*@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "UpdateForm" }))
+    {*@
+<form id="UpdateForm" name="UpdateForm">
+
+    <table style="width: 700px;">
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <!-- 驗證資料 -->
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(x => x.PrdID)
+            @Html.HiddenFor(x => x.PrdImageEXT)
+            @Html.HiddenFor(x => x.MenuType)
+            <!-- 隱藏欄位，並將欄位設定ReadOnly -->
+            <tr>
+                <div class="form-group">
+                <td><h3 style="color:black">@Html.DisplayName("商品編號")</h3></td>
+                <td>
+                    <div class="col-md-10">
+                        @Html.DisplayFor(x => x.PrdID)
+                    </div>
+                </td>
+                </div>
+            </tr>
+
+            <tr>
+                <div class="form-group">
+                    <td><h3 style="color:black">@Html.DisplayName("商品狀態")</h3></td>
+                    <td>
+                        <div class="col-md-10">
+                            @{
+                                @*@Html.DropDownListFor(model => model.DTypeSelectList, Model.DTypeSelectList, new { id = "queryDType", @class = "form-control " })*@
+                                List<Option> PrdStatusList = (List<Option>)ViewBag.PrdStatus;
+                                @Html.DropDownListFor(x => x.PrdStatus, //Name
+                                                      new SelectList(PrdStatusList, "ListID", "ListName"), /*集合*/
+                                                      string.Empty,
+                                                      new { required = "required" }) @*值*@
+                            }
+                        </div>
+                    </td>
+                </div>
+            </tr>
+
+            <tr>
+                <div class="form-group">
+                <td><h3 style="color:black">@Html.DisplayName("商品類型")</h3></td>
+                <td>
+                    <div class="col-md-10">
+                        @{
+                            List<Option> PrdTypeList = (List<Option>)ViewBag.PrdType;
+                            @Html.DropDownListFor(x => x.PrdType,
+                                                  new SelectList(PrdTypeList, "ListID", "ListName"),
+                                                  string.Empty,
+                                                  new { required = "required" })
+                        }
+                    </div>
+                </td>
+                </div>
+            </tr>
+
+            <tr>
+                <div class="form-group">
+                <td><h3 style="color:black">@Html.DisplayName("商品名稱")</h3></td>
+                <td>
+                    <div class="col-md-10">
+                        @Html.EditorFor(x => x.PrdName, new { htmlAttributes = new { @required = "required" } })
+                    </div>
+                </td>
+                </div>
+            </tr>
+
+            <tr>
+                <div class="form-group">
+                <td><h3 style="color:black">@Html.DisplayName("商品內容")</h3></td>
+                <td>
+                    <div class="col-md-10">
+                        @Html.TextAreaFor(x => x.PrdContent, new { cols = 75, @rows = 6 })
+                    </div>
+                </td>
+                </div>
+            </tr>
+
+            <tr>
+                <div class="form-group">
+                <td><h3 style="color:black">@Html.DisplayName("商品售價")</h3></td>
+                <td>
+                    <div class="col-md-10">
+                        @Html.EditorFor(x => x.PrdPrice, new { htmlAttributes = new { min = "0", max = "99990", step = "1", @required = "required" } })
+                    </div>
+                </td>
+                </div>
+            </tr>
+
+            <tr>
+                <div class="form-group">
+                <td><h3 style="color:black">@Html.DisplayName("商品庫存量")</h3></td>
+                <td>
+                    <div class="col-md-10">
+                        @Html.EditorFor(x => x.PrdQuantity, new { htmlAttributes = new { min = "0", max = "99990", step = "1", @required = "required" } })
+                    </div>
+                </td>
+                </div>
+            </tr>
+
+        </div>
+    </table>
+</form>
+@*}*@
+
+<table style="width:72%;">
+    <tr style="text-align: right; ">
+        <td>
+            <br />
+            <input class="btn" onclick="btnUpdate()" value="修改">
+        </td>
+        <td>
+            <br />
+            <div>
+                @using (Html.BeginForm("Delete", "Home", FormMethod.Post, new { onclick = "return Confirm_Form()" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(x => x.PrdID)
+
+                    <input type="submit" class="btn" value="刪除">
+                    @*<button class="btn" onclick="location.href='@Url.Action("Delete", "Home", new { _PrdID = Model.PrdID })'">刪除</button>*@
+                }
+            </div>
+        </td>
+    </tr>
+</table>
+
+@section Update{
+
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://malsup.github.io/jquery.form.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+
+    <script type="text/javascript">
+
+        $("#UpdateForm").validate({
+            rules: {
+                PrdStatus: {
+                    required: true
+                },
+                PrdType: {
+                    required: true
+                },
+                PrdName: {
+                    required: true,
+                    maxlength: 50
+                },
+                PrdContent: {
+                    maxlength: 500
+                },
+                PrdPrice: {
+                    required: true,
+                    min: 0
+                },
+                PrdQuantity: {
+                    required: true,
+                    min: 0
+                }
+            },
+            messages: {
+                PrdStatus: {
+                    required: "必填欄位"
+                },
+                PrdType: {
+                    required: "必填欄位"
+                },
+                PrdName: {
+                    required: "必填欄位",
+                    maxlength: "請輸入長度介於{0}的字串"
+                },
+                PrdContent: {
+                    maxlength: "請輸入長度介於{0}的字串"
+                },
+                PrdPrice: {
+                    required: "必填欄位",
+                    maxlength: "請輸入一個最小為{0}的值"
+                },
+                PrdQuantity: {
+                    required: "必填欄位",
+                    maxlength: "請輸入一個最小為{0}的值"
+                },
+            },
+            highlight: function (element) {
+                $(element).parent().addClass('error')
+            },
+            unhighlight: function (element) {
+                $(element).parent().removeClass('error')
+            }
+        });
+
+        function btnUpdate() {
+            //$.ajaxSetup({
+            //    async: true
+            //});
+
+            var validateState = $("#UpdateForm").valid();   //檢測表單是否驗證通過 并進行表單驗證
+            /*debugger*/
+            if (!validateState) {
+                return false;
+            }
+
+           var myForm = $("#UpdateForm");
+           var dataForm = myForm.serialize();
+            //$.ajaxSetup({
+            //    async: false
+            //});
+
+            /*$('#UpdateForm').ajaxSubmit({*/
+            $.ajax({
+                type: 'POST',                               //post/get
+                url: '@Url.Action("EditConfirm", "Home")',  //url位置
+                data: dataForm,                             //輸入的資料
+                cache: false,                               //不快取頁面
+                async: false,
+                dataType: 'json',
+                success: function (data) {                  //成功後要執行的函數
+                    if (data.IsSuccess) {
+                        alert(data.Message);
+                        window.location.href = "/Home/List";
+                    }
+                    else if (!data.IsSuccess) {
+                        alert(data.Message);
+                    }
+                }
+            });
+        };
+
+        function Confirm_Form() {
+            if (!confirm("您確定要刪除嗎?"))
+                return false;
+        };
+
+    </script>
+}

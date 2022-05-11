@@ -1,0 +1,220 @@
+﻿@using BookStore.Models
+@using BookStore.Services
+@using BookStore.CommonProject
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @* css *@
+    @* <link rel="stylesheet" href="~/Scripts/style.css" type="text/css" media="all" /> *@
+    @*@Styles.Render("~/Content/bootstrap.css")*@
+    @Styles.Render("~/Content/style.css")
+    @Styles.Render("~/Content/PagedList.css")
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <!-- Shell -->
+    <div class="shell">
+
+        <!-- Header -->
+        <!-- Header 的標籤，通常這標籤會表示頁首 -->
+        <!-- css呼叫 #header使用id，.shell使用class -->
+        <div id="header">
+            <h1 id="logo"><a href="@Url.Action("ReturnIndex", "Home")">網路書城</a></h1>
+
+            <!-- Navigation -->
+            <div id="navigation">
+                <ul style="float: left;">
+                    <li>@Html.ActionLink("首頁", "ReturnIndex", "Home")</li>
+                    <li>@Html.ActionLink("關於", "About", "Home")</li>
+                    <li>@Html.ActionLink("聯絡方式", "Contact", "Home")</li>
+                    @if (Request.IsAuthenticated)
+                    {
+                        <li>@Html.ActionLink("產品列表", "List", "Home", new { _Page = 1 })</li>
+                    }
+                </ul>
+                <ul style="float: right; margin-right: 25px;">
+                    <li>@Html.Partial("_LoginPartial")</li>
+                    <li id="Cart">@Html.Partial("_CartPartial")</li>
+                    <!--********************不同身分功能顯示********************-->
+                    <!-- 匿名:註冊，登入，購物車 -->
+                    <!-- 一般:會員管理，登出，購物車 -->
+                    <!-- 管理者:商品上傳，商品管理，會員管理，登出，購物車 -->
+                    <!-- 使用sessoin -->
+                    <!-- Cart
+                    <div id="cart">
+                        <a href="#" class="cart-link">Your Shopping Cart</a>
+                        <div class="cl">&nbsp;</div>
+                        <span>Articles: <strong>4</strong></span> &nbsp;&nbsp; <span>Cost: <strong>$250.99</strong></span>
+                    </div>
+                         End Cart -->
+                </ul>
+            </div>
+            <!-- End Navigation -->
+        </div>
+        <!-- End Header -->
+        <!-- Main -->
+        <!-- 主要頁面 -->
+        <div id="main">
+            <div class="cl">&nbsp;</div>
+
+            <!-- Content -->
+            <!-- 右側內容 -->
+            <div id="content">
+                @RenderBody()
+                @* @RenderBody()是 MVC 在佈局頁特殊的關鍵語法，意思是 @RenderBody() 的內容將會被內容頁給取代。
+                    在之後新增頁面時，可以選擇套用此佈局頁，套用之後，新頁面的內容只會顯示在 @RenderBody() 裡面。 *@
+            </div>
+            <!-- End Content -->
+            <!-- Sidebar -->
+            <!-- 左側列表 -->
+            <div id="sidebar">
+
+                <!-- Search -->
+                <!-- 查詢區塊 -->
+                <div class="box search">
+                    <h2>搜尋書籍 <span></span></h2>
+                    <div class="box-content">
+                        <!-- 查詢表單 -->
+                        @using (Html.BeginForm("Search", "Home", FormMethod.Get))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <label>書名</label>
+                            @Html.TextBox("PrdName", "", new { @class = "field", placeholder = "請輸入關鍵字" })
+
+                            <label>類型</label>
+                            List<Option> PrdTypeList = (List<Option>)Session["PrdTypeList"];
+                            @Html.DropDownList("PrdType", //Name
+                                               new SelectList(PrdTypeList.Where(x => x.ListID.Substring(0, 1) == MappingCode.MenuTypeItem.Book), "ListID", "ListName"), //集合
+                                               "-- 請選擇書籍類型 --", //顯示文字
+                                               new { @class = "field" })
+
+                            <label>售價</label>
+                            <div class="inline-field">
+                                @Html.TextBox("PrdPriceS", "10", new { Type = "number", style = "width:50px;", min = "10", max = "99990", step = "10", align = "right" })
+                                <label> ~ </label>
+                                @Html.TextBox("PrdPriceE", "1000", new { Type = "number", style = "width:50px;", min = "10", max = "99990", step = "10" })
+                            </div>
+                            <br />
+                            <input type="submit" class="search-submit" value="搜尋">
+                        }
+                    </div>
+                </div>
+                <!-- End Search -->
+                <!-- Categories -->
+                <!-- 選單 -->
+                @Html.Partial("_Menu")
+                <!-- End Categories -->
+            </div>
+            <!-- End Sidebar -->
+
+            <div class="cl">&nbsp;</div>
+        </div>
+        <!-- End Main -->
+        <!-- Footer -->
+        <!-- Footer 的標籤，通常這標籤會表示頁尾 -->
+        <div id="footer">
+            <p class="left"> @Html.ActionLink("首頁", "ReturnIndex", "Home") | @Html.ActionLink("關於", "About", "Home") | @Html.ActionLink("聯絡方式", "Contact", "Home") </p>
+            <p class="right"> &copy; 2022 Shop Around </p>
+        </div>
+        <!-- End Footer -->
+    </div>
+
+    @* javascript *@
+    @*<script src="~/Scripts/jquery-1.4.1.min.js" type="text/javascript"></script>
+        <script src="~/Scripts/jquery.jcarousel.pack.js" type="text/javascript"></script>
+        <script src="~/Scripts/jquery-func.js" type="text/javascript"></script>*@
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("Quantity", required: false)
+    @RenderSection("Update", required: false)
+    @RenderSection("Add", required: false)
+    @RenderSection("Scripts", required: false)
+    @* @RenderSection("scripts", required: false) 是在內容頁寫的 JavaScript 可以用 @section scripts 語法放置在這個區塊內。 *@
+    <script type="text/javascript">
+
+        $(function () {
+            $("#file1").on("change", function () {
+                var file = this.files[0];
+                if (this.files && file) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $("#img1").attr("src", e.target.result);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+        function AddToCart(PrdID, Quantity) {
+
+            $.ajax({
+                type: 'POST',                               //post
+                url: '@Url.Action("AddToCart", "Cart")',    //url位置
+                data: {
+                    PrdID: PrdID,
+                    Quantity: Quantity
+                },                                          //輸入的資料
+                success:
+                    alert("新增成功!")
+            })
+                .done(function (data) {
+                    /*debugger*/
+                    $("#Cart").html(data);                  //更新部分顯示
+                })
+        };
+
+        function AddToCartForm() {
+
+            var myForm = $("#CartForm");
+            var dataForm = myForm.serialize();
+
+            $.ajax({
+                type: 'POST',                               //post
+                url: '@Url.Action("AddToCart", "Cart")',    //url位置
+                data: dataForm,                             //輸入的資料
+                success:
+                    alert("新增成功!")
+            })
+                .done(function (data) {
+                    /*debugger*/
+                    $("#Cart").html(data);                  //更新部分顯示
+                })
+        };
+
+        function RemoveToCart(PrdID) {
+
+            $.ajax({
+                type: 'POST',                               //post
+                url: '@Url.Action("RemoveToCart", "Cart")', //url位置
+                data: {
+                    _PrdID: PrdID
+                }                                           //輸入的資料
+            })
+                .done(function (data) {
+                    /*debugger*/
+                    $("#Cart").html(data);                  //更新部分顯示
+                })
+        };
+
+        function ClearToCart() {
+
+            $.ajax({
+                type: 'POST',                               //post
+                url: '@Url.Action("ClearToCart", "Cart")',  //url位置
+                data: { }                                   //輸入的資料
+            })
+                .done(function (data) {
+                    /*debugger*/
+                    $("#Cart").html(data);                  //更新部分顯示
+                })
+        };
+
+    </script>
+</body>
+</html>
